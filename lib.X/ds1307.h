@@ -1,0 +1,44 @@
+#ifndef DS1307RTC_h
+#define DS1307RTC_h
+
+//endereço do dispositivo, deslocado por causa do bit de RW
+#define DS1307_CTRL_ID (0x68<<1)
+#define I2C_WRITE 0
+#define I2C_READ  1
+
+//definição dos endereços
+#define SEC     0
+#define MIN     1
+#define HOUR    2
+#define WEEKDAY 3
+#define DAY     4
+#define MONTH   5
+#define YEAR    6
+
+	//funções do DS1307
+	void dsInit(void);
+	void dsStartClock(void);
+	void dsStopClock(void);
+	unsigned char dec2bcd(unsigned char value);
+	unsigned char bcd2dec(unsigned char value);
+	void dsWriteData(unsigned char value, unsigned char address);
+	int dsReadData(unsigned char address);
+
+//funções de leitura/escrita simplificadas
+#define getSeconds()  (bcd2dec(dsReadData(SEC)& 0x7f))
+#define getMinutes()  (bcd2dec(dsReadData(MIN)& 0x7f))
+#define getHours()    (bcd2dec(dsReadData(HOUR)& 0x5f))
+#define getWeekDay()  (bcd2dec(dsReadData(WEEKDAY)& 0x07))
+#define getDays()     (bcd2dec(dsReadData(DAY)& 0x5f))
+#define getMonths()   (bcd2dec(dsReadData(MONTH)& 0x3f))
+#define getYears()    (bcd2dec(dsReadData(YEAR)& 0xff))
+
+#define setSeconds(v) (dsWriteData(dec2bcd(v),SEC))
+#define setMinutes(v) (dsWriteData(dec2bcd(v),MIN))
+#define setHours(v)   (dsWriteData(dec2bcd(v),HOUR))
+#define setWeekDay(v) (dsWriteData(dec2bcd(v),WEEKDAY))
+#define setDays(v)    (dsWriteData(dec2bcd(v),DAY))
+#define setMonths(v)  (dsWriteData(dec2bcd(v),MONTH))
+#define setYears(v)   (dsWriteData(dec2bcd(v),YEAR))
+
+#endif
