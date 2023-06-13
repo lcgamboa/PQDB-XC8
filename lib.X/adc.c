@@ -39,7 +39,7 @@ unsigned int adcRead(unsigned int channel) {
     unsigned int ADvalor;
     ADCON0 &= 0b11000011; //zera os bits do canal
     if (channel < 3) {
-        ADCON0 |= channel << 2;
+        ADCON0 |= (2 - channel) << 2;
     }
 
     ADCON0 |= 0b00000010; //inicia conversao
@@ -48,6 +48,6 @@ unsigned int adcRead(unsigned int channel) {
 
     ADvalor = ADRESH; // le o resultado
     ADvalor <<= 8;
-    ADvalor += ADRESL;
+    ADvalor |= ADRESL;
     return ADvalor;
 }

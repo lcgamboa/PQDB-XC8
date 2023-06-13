@@ -1,8 +1,7 @@
 
-#define USE_LCD
+//#define USE_LCD
 
-#define USE_RTC
-
+#include "config.h" 
 #include "adc.h"
 #include "keypad.h"
 #include "io.h"
@@ -19,9 +18,8 @@
 #include "ssd.h"
 #include "timer.h"
 #include "i2c.h"
-#ifdef USE_RTC
 #include "ds1307.h"
-#endif
+
 #ifdef USE_LCD
 
 #define LcdWriteCharacter(X) lcdChar(X)
@@ -48,6 +46,7 @@ void LcdXY(const char x, const char y) {
 #endif
 
 void main() {
+    unsigned int timecont = 0;
     //RTC e LCD
 
     serialInit(0);
@@ -59,10 +58,9 @@ void main() {
     initializeDisplay(0xC0, 0x07, 0x014);
 #endif
 
-#ifdef USE_RTC
+
     //RTC
     dsInit();
-#endif
 
     //74HC595
     soInit();
@@ -78,6 +76,8 @@ void main() {
 
     //Display 7 Seg.
     ssdInit();
+    ssdPoint(0, 1);
+    ssdPoint(2, 1);
 
     //RGB
     rgbInit();
@@ -108,7 +108,7 @@ void main() {
     for (int i = 0; i < 504; i++) LcdWriteData(0x00); // clear LCD
 #endif
 
-#ifdef USE_RTC
+
     dsStartClock();
     /*
     dsWrite(0x57, SEC);
@@ -119,8 +119,7 @@ void main() {
     dsWrite(5, MONTH);
     dsWrite(0x23, YEAR);
      */
-#endif
-    timerReset(1000);
+
     for (;;) {
 
         unsigned int i = 0;
@@ -129,69 +128,50 @@ void main() {
         unsigned int l = 0;
 
         //LM35
-        i = adcRead(0);
-        i = i - 30;
+        i = adcRead(0)*500L / 1023;
 
         LcdXY(0, 0);
+        LcdWriteCharacter((i / 100) % 10 + 48);
         LcdWriteCharacter((i / 10) % 10 + 48);
         LcdWriteCharacter((i / 1) % 10 + 48);
-
+        LcdWriteCharacter('C');
 
         //RTC e LCD
-        if (timerEnded()) {
-            timerReset(1000);
-#ifdef USE_RTC
+        if (timecont >= 1000) {
+            timecont = 0;
             i = getHours();
-#else
-            i = 12;
-#endif
+
             LcdXY(0, 1);
             LcdWriteCharacter((i / 10) % 10 + 48);
             LcdWriteCharacter((i / 1) % 10 + 48);
 
             LcdWriteCharacter(':');
-#ifdef USE_RTC
+
             i = getMinutes();
-#else
-            i = 30;
-#endif
             LcdWriteCharacter((i / 10) % 10 + 48);
             LcdWriteCharacter((i / 1) % 10 + 48);
 
             LcdWriteCharacter(':');
 
-#ifdef USE_RTC
             i = getSeconds();
-#else
-            i = 45;
-#endif
+
             LcdWriteCharacter((i / 10) % 10 + 48);
             LcdWriteCharacter((i / 1) % 10 + 48);
 
             LcdXY(0, 2);
-#ifdef USE_RTC
+
             i = getDays();
-#else
-            i = 2;
-#endif
             LcdWriteCharacter((i / 10) % 10 + 48);
             LcdWriteCharacter((i / 1) % 10 + 48);
             LcdWriteCharacter('/');
-#ifdef USE_RTC
+
             i = getMonths();
-#else
-            i = 11;
-#endif
             LcdWriteCharacter((i / 10) % 10 + 48);
             LcdWriteCharacter((i / 1) % 10 + 48);
 
             LcdWriteCharacter('/');
 
-#ifdef USE_RTC
             i = getYears();
-#else
-            i = 23;
-#endif
             LcdWriteCharacter((i / 10) % 10 + 48);
             LcdWriteCharacter((i / 1) % 10 + 48);
 
@@ -206,16 +186,18 @@ void main() {
             }
         }
 
-        j = adcRead(2); // Leitura do POT
-        l = adcRead(1); //Leitura LDR
-        ssdDigit(3, (j / 10) % 10); // Dezena POT
-        ssdDigit(2, (j / 100) % 10); // Unidade POT
-        ssdDigit(1, (l / 10) % 10); // Dezena LDR
-        ssdDigit(0, (l / 100) % 10); // Unidade LDR
+        j = adcRead(2)*50 / 1023; // Leitura do POT
+        l = adcRead(1)*50 / 1023; //Leitura LDR
+
+        ssdDigit(3, (j) % 10); // Dezena POT
+        ssdDigit(2, (j / 10) % 10); // Unidade POT
+        ssdDigit(1, (l) % 10); // Dezena LDR
+        ssdDigit(0, (l / 10) % 10); // Unidade LDR
 
         for (j = 0; j < 8; j++) { // Delay
             ssdUpdate();
             timerDelay(5);
         }
+        timecont += 40;
     }
 }

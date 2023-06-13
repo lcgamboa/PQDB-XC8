@@ -1,3 +1,4 @@
+#include "config.h" 
 #include "so.h"
 #include "ssd.h"
 #include "timer.h"

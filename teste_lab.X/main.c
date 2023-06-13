@@ -53,6 +53,7 @@ void main(void) {
     serialInit(0);
     pwmInit();
     timerInit();
+    TRISAbits.TRISA5 = 0;
     i = 0;
     int seg = 0;
     int rtc_seg;
@@ -62,6 +63,7 @@ void main(void) {
     char slot = 0;
     char seg_slot = 0;
     for (;;) {
+        PORTAbits.RA5 = 1;
         timerReset(5);
         i++;
         switch (slot) {
@@ -135,7 +137,8 @@ void main(void) {
                 slot++;
                 break;
             case 3:
-                v = adcRead(2);
+                v = adcRead(2)*500L / 1023;
+                ssdPoint(1, 1);
                 ssdDigit(3, ((v / 1) % 10));
                 ssdDigit(2, ((v / 10) % 10));
                 ssdDigit(1, ((v / 100) % 10));
@@ -146,6 +149,7 @@ void main(void) {
         }
 
         ssdUpdate();
+        PORTAbits.RA5 = 0;
         timerWait();
     }
 }

@@ -59,8 +59,8 @@ void pwmInit(void) {
 void pwmBuzzer(unsigned int freq) {
     pwmInit();
     if (freq > 0) {
-        pwmSet(50);
         pwmFrequency(freq);
+        pwmSet(50);
     } else {
         pwmSet(0);
     }

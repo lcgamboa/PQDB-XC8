@@ -1,15 +1,18 @@
 #ifndef nokia5110_h
 #define nokia5110_h
 
-#define RST PIN_D7
-#define DC  PIN_D3
-#define DIN  PIN_D2
-#define CLK  PIN_D6
+#include <xc.h>
+#include "io.h"
+
+#define LCD_RST  PIN_D5
+#define LCD_DC   PIN_D1
+#define LCD_DIN  PIN_D0
+#define LCD_CLK  PIN_D4
 
 #define LCD_WIDTH   84
 #define LCD_HEIGHT  48
-#define WHITE       0
-#define BLACK       1
+#define LCD_WHITE    0
+#define LCD_BLACK    1
 
 
 static const unsigned char ASCII[]  =

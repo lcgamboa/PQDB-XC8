@@ -92,11 +92,12 @@ unsigned char serialRead(void) {
 
 void serialInit(char use_interrupt) {
     use_int = use_interrupt;
-    TXSTA = 0b00101100; //configura a transmissão de dados da serial
-    RCSTA = 0b10010000; //configura a recepção de dados da serial
-    BAUDCON = 0b00001000; //configura sistema de velocidade da serial
     SPBRGH = 0; //configura para 56k
     SPBRG = 34; //configura para 56k
+    BAUDCON = 0b00001000; //configura sistema de velocidade da serial
+    TXSTA = 0b00101100; //configura a transmissão de dados da serial
+    RCSTA = 0b10010000; //configura a recepção de dados da serial
+
     bitSet(TRISC, 6); //pino de recepção de dados
     bitSet(TRISC, 7); //pino de envio de dados
     if (use_int) {

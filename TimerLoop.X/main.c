@@ -1,16 +1,14 @@
+#include "config.h" 
 #include "ssd.h"
 #include "so.h"
-#include<xc.h>
 
 void main() {
     soInit();
     ssdInit();
-    TRISBbits.TRISB5 = 0;
     int cont = 0, seg = 0, minutos = 0, hora = 0;
 
     for (;;) { //Loop que toma aproximadamente 1,086ms para ser executado.
 
-        PORTBbits.RB5 ^= 1;
         if (cont >= 921) //1,086*921 = 1000,206 ~ 1000ms = 1s
         {
             seg++;

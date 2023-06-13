@@ -1,5 +1,6 @@
 //#define CHIPKIT
 #include <stdlib.h>
+#include "config.h" 
 #include "adc.h"
 #include "lcd.h"
 #include "keypad.h"

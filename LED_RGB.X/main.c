@@ -1,3 +1,4 @@
+#include "config.h" 
 #include "timer.h"
 #include "rgb.h"
 

@@ -1,6 +1,5 @@
-#include <xc.h>
+
 #include "nokia5110.h"
-#include "io.h"
 #include "so.h"
 
 unsigned char lineMatrix[LCD_WIDTH * LCD_HEIGHT / 8] = {
@@ -54,12 +53,12 @@ unsigned char lineMatrix[LCD_WIDTH * LCD_HEIGHT / 8] = {
 };
 
 void initializeDisplay(unsigned char vop, unsigned char tempCoef, unsigned char bias) {
-    pinMode(RST, OUTPUT);
-    pinMode(DC, OUTPUT);
-    pinMode(DIN, OUTPUT);
-    pinMode(CLK, OUTPUT);
-    digitalWrite(RST, LOW);
-    digitalWrite(RST, HIGH);
+    pinMode(LCD_RST, OUTPUT);
+    pinMode(LCD_DC, OUTPUT);
+    pinMode(LCD_DIN, OUTPUT);
+    pinMode(LCD_CLK, OUTPUT);
+    digitalWrite(LCD_RST, LOW);
+    digitalWrite(LCD_RST, HIGH);
 
     LcdWriteCmd(0x21); // LCD extended commands 0010 0001 --- 0010 PD V H   PowerDown = 0, V = 0, H = 1
     //V = 0 para ativar escrita horizontal
@@ -205,16 +204,17 @@ void LcdWriteCharacter(char character) {
     LcdWriteData(0x00);
 }
 
-static void shiftOut(unsigned char dat) {
+static inline void shiftOut(unsigned char dat) {
     for (int i = 7; i >= 0; i--) {
-        digitalWrite(DIN, (dat & (1 << (i))) > 0);
-        digitalWrite(CLK, HIGH);
-        digitalWrite(CLK, LOW);
+        digitalWrite(LCD_DIN, (dat & (1 << (i))) > 0);
+        digitalWrite(LCD_CLK, HIGH);
+        digitalWrite(LCD_CLK, LOW);
     }
+    PORTD &= 0xF0; //desliga todos os displays
 }
 
 void LcdWriteData(unsigned char dat) {
-    digitalWrite(DC, HIGH); //DC pin is low for commands
+    digitalWrite(LCD_DC, HIGH); //DC pin is low for commands
     shiftOut(dat); //transmit serial data
 }
 
@@ -224,6 +224,6 @@ void LcdXY(unsigned char x, unsigned char y) {
 }
 
 void LcdWriteCmd(unsigned char cmd) {
-    digitalWrite(DC, LOW); //DC pin is low for commands
+    digitalWrite(LCD_DC, LOW); //DC pin is low for commands
     shiftOut(cmd); //transmit serial data
 }
