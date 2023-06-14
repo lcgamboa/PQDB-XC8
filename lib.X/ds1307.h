@@ -27,9 +27,9 @@
 //funções de leitura/escrita simplificadas
 #define getSeconds()  (bcd2dec(dsReadData(SEC)& 0x7f))
 #define getMinutes()  (bcd2dec(dsReadData(MIN)& 0x7f))
-#define getHours()    (bcd2dec(dsReadData(HOUR)& 0x5f))
+#define getHours()    (bcd2dec(dsReadData(HOUR)& 0x3f))
 #define getWeekDay()  (bcd2dec(dsReadData(WEEKDAY)& 0x07))
-#define getDays()     (bcd2dec(dsReadData(DAY)& 0x5f))
+#define getDays()     (bcd2dec(dsReadData(DAY)& 0x3f))
 #define getMonths()   (bcd2dec(dsReadData(MONTH)& 0x3f))
 #define getYears()    (bcd2dec(dsReadData(YEAR)& 0xff))
 

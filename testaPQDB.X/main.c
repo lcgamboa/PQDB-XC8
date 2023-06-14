@@ -1,5 +1,5 @@
 
-//#define USE_LCD
+#define USE_LCD
 
 #include "config.h" 
 #include "adc.h"
@@ -28,17 +28,17 @@ void LcdXY(const char x, const char y) {
 
     switch (y) {
         case 0:
-            lcdCommand(0x80 + x);
+            lcdCommand(0x80 + x / 6);
             break;
         case 1:
-            lcdCommand(0xC0 + x);
+            lcdCommand(0xC0 + x / 6);
             break;
         case 2:
-            lcdCommand(0x88 + x);
+            lcdCommand(0x88 + x / 6);
             break;
         case 3:
         case 4:
-            lcdCommand(0xCA + x);
+            lcdCommand(0xCA + x / 6);
             break;
     }
 }
@@ -47,6 +47,7 @@ void LcdXY(const char x, const char y) {
 
 void main() {
     unsigned int timecont = 0;
+    unsigned char rtc_slot = 0;
     //RTC e LCD
 
     serialInit(0);
@@ -138,43 +139,53 @@ void main() {
 
         //RTC e LCD
         if (timecont >= 1000) {
-            timecont = 0;
-            i = getHours();
-
-            LcdXY(0, 1);
-            LcdWriteCharacter((i / 10) % 10 + 48);
-            LcdWriteCharacter((i / 1) % 10 + 48);
-
-            LcdWriteCharacter(':');
-
-            i = getMinutes();
-            LcdWriteCharacter((i / 10) % 10 + 48);
-            LcdWriteCharacter((i / 1) % 10 + 48);
-
-            LcdWriteCharacter(':');
-
-            i = getSeconds();
-
-            LcdWriteCharacter((i / 10) % 10 + 48);
-            LcdWriteCharacter((i / 1) % 10 + 48);
-
-            LcdXY(0, 2);
-
-            i = getDays();
-            LcdWriteCharacter((i / 10) % 10 + 48);
-            LcdWriteCharacter((i / 1) % 10 + 48);
-            LcdWriteCharacter('/');
-
-            i = getMonths();
-            LcdWriteCharacter((i / 10) % 10 + 48);
-            LcdWriteCharacter((i / 1) % 10 + 48);
-
-            LcdWriteCharacter('/');
-
-            i = getYears();
-            LcdWriteCharacter((i / 10) % 10 + 48);
-            LcdWriteCharacter((i / 1) % 10 + 48);
-
+            switch (rtc_slot) {
+                case 0:
+                    i = getHours();
+                    LcdXY(0, 1);
+                    LcdWriteCharacter((i / 10) % 10 + 48);
+                    LcdWriteCharacter((i / 1) % 10 + 48);
+                    LcdWriteCharacter(':');
+                    break;
+                case 1:
+                    i = getMinutes();
+                    LcdXY(18, 1);
+                    LcdWriteCharacter((i / 10) % 10 + 48);
+                    LcdWriteCharacter((i / 1) % 10 + 48);
+                    LcdWriteCharacter(':');
+                    break;
+                case 2:
+                    i = getSeconds();
+                    LcdXY(36, 1);
+                    LcdWriteCharacter((i / 10) % 10 + 48);
+                    LcdWriteCharacter((i / 1) % 10 + 48);
+                    break;
+                case 3:
+                    i = getDays();
+                    LcdXY(0, 2);
+                    LcdWriteCharacter((i / 10) % 10 + 48);
+                    LcdWriteCharacter((i / 1) % 10 + 48);
+                    LcdWriteCharacter('/');
+                    break;
+                case 4:
+                    i = getMonths();
+                    LcdXY(18, 2);
+                    LcdWriteCharacter((i / 10) % 10 + 48);
+                    LcdWriteCharacter((i / 1) % 10 + 48);
+                    LcdWriteCharacter('/');
+                    break;
+                case 5:
+                    i = getYears();
+                    LcdXY(36, 2);
+                    LcdWriteCharacter((i / 10) % 10 + 48);
+                    LcdWriteCharacter((i / 1) % 10 + 48);
+                    break;
+                default:
+                    timecont -= 1000;
+                    rtc_slot = 0xFF;
+                    break;
+            }
+            rtc_slot++;
         }
 
         LcdXY(0, 4);
